@@ -1,0 +1,41 @@
+{
+	"appPort": [],
+	"build": {
+		"args": {
+			"ALPINE_VERSION": "3.19",
+			"NODEJS_VERSION": "22.3.0"
+		},
+		"cacheFrom": [],
+		"dockerfile": "./Dockerfile",
+		"options": []
+	},
+	"capAdd": [],
+	"containerEnv": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
+	"features": {},
+	"forwardPorts": [],
+	"init": false,
+	"mounts": [],
+	"name": "Development",
+	"otherPortsAttributes": {},
+	"overrideCommand": true,
+	"portsAttributes": {},
+	"privileged": false,
+	"remoteEnv": {},
+	"remoteUser": "root",
+	"runArgs": [],
+	"securityOpt": [],
+	"shutdownAction": "stopContainer",
+	"updateRemoteUserUID": true,
+	"userEnvProbe": "none",
+	"workspaceFolder": "/home/${localWorkspaceFolderBasename}",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/${localWorkspaceFolderBasename},type=bind,consistency=cached"
+}
