@@ -14,7 +14,7 @@
 		"prettier-plugin-svelte": "3.3.2",
 		"svelte": "5.16.0",
 		"typescript": "5.6.3",
-		"vite": "6.0.5"
+		"vite": "6.0.6"
 	},
 	"homepage": "https://github.com/Rafal-Majewski/geni-prioritizer#readme",
 	"license": "CC0-1.0",
