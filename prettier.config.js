@@ -1,15 +1,14 @@
-const prettierConfig = {
+/** @satisfies {import("prettier").Options} */
+export default {
 	arrowParens: "always",
-	bracketSameLine: false,
 	bracketSpacing: false,
 	endOfLine: "lf",
-	plugins: ["prettier-plugin-svelte"],
+	plugins: [],
 	printWidth: 100,
+	proseWrap: "always",
 	quoteProps: "as-needed",
 	semi: true,
 	singleQuote: false,
 	trailingComma: "all",
 	useTabs: true,
 };
-
-export default prettierConfig;

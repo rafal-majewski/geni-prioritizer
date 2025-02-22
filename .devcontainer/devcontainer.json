@@ -2,8 +2,8 @@
 	"appPort": [],
 	"build": {
 		"args": {
-			"ALPINE_VERSION": "3.19",
-			"NODEJS_VERSION": "22.3.0"
+			"ALPINE_VERSION": "3.20",
+			"NODE_JS_VERSION": "22.11.0"
 		},
 		"cacheFrom": [],
 		"dockerfile": "./Dockerfile",
@@ -11,13 +11,10 @@
 	},
 	"capAdd": [],
 	"containerEnv": {},
+	"containerUser": "developer",
 	"customizations": {
 		"vscode": {
-			"extensions": [
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
-				"ms-azuretools.vscode-docker"
-			]
+			"extensions": ["esbenp.prettier-vscode", "svelte.svelte-vscode"]
 		}
 	},
 	"features": {},
@@ -30,12 +27,12 @@
 	"portsAttributes": {},
 	"privileged": false,
 	"remoteEnv": {},
-	"remoteUser": "root",
+	"remoteUser": "developer",
 	"runArgs": [],
 	"securityOpt": [],
 	"shutdownAction": "stopContainer",
 	"updateRemoteUserUID": true,
 	"userEnvProbe": "none",
-	"workspaceFolder": "/home/${localWorkspaceFolderBasename}",
-	"workspaceMount": "source=${localWorkspaceFolder},target=/home/${localWorkspaceFolderBasename},type=bind,consistency=cached"
+	"workspaceFolder": "/home/developer/${localWorkspaceFolderBasename}",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/developer/${localWorkspaceFolderBasename},type=bind,consistency=consistent"
 }
