@@ -4,18 +4,11 @@ export class PriorityQueue<Datum> {
 	public constructor() {
 		this.queue = [];
 	}
-	public push(data: Datum, priority: number): void {
-		this.queue.push({
-			datum: data,
-			priority,
-		});
-		this.queue.sort((entryLeft, entryRight) => entryRight.priority - entryLeft.priority);
+	public push(entry: PriorityQueueEntry<Datum>): void {
+		this.queue.push(entry);
+		this.queue.sort((entryLeft, entryRight) => entryLeft.priority - entryRight.priority);
 	}
-	public pop(): Datum | undefined {
-		const entry = this.queue.pop();
-		if (entry === undefined) {
-			return undefined;
-		}
-		return entry.datum;
+	public pop(): PriorityQueueEntry<Datum> | undefined {
+		return this.queue.pop();
 	}
 }

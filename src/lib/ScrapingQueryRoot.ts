@@ -1,5 +1,5 @@
-import type {PersonUrl} from "./PersonUrl.ts";
+import type {PersonProfileUrl} from "./PersonProfileUrl.ts";
 export type ScrapingQueryRoot = Readonly<{
-	url: PersonUrl;
+	url: PersonProfileUrl;
 	priority: number;
 }>;

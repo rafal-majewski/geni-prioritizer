@@ -6,6 +6,7 @@ export const actions = {
 		const rawFormData: FormData = await request.formData();
 		const formData = computeScrapingQueryFormDataFromRawFormData(rawFormData);
 		if (formData === null) {
+			// TODO: Return Svelte data
 			return fail(400);
 		}
 		const newFormData = addRootToScrapingQueryFormData(formData);
