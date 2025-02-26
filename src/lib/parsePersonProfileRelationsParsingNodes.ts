@@ -7,11 +7,8 @@ export function parsePersonProfileRelationsParsingNodes(
 	nodes: readonly SupportedPersonProfileRelationsParsingNode[],
 ): RelationTypeToPersonProfileReferences {
 	let parser: PersonProfileRelationsParser = new FirstRelationTypePersonProfileRelationsParser();
-	console.log(nodes);
 	for (const node of nodes) {
-		console.log(parser, JSON.stringify(node));
 		parser = parsePersonProfileRelationsParsingNode(parser, node);
 	}
-	console.log(parser);
 	return parser.finalize();
 }

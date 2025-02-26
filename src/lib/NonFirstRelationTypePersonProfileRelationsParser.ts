@@ -1,6 +1,7 @@
 import {FirstPersonProfileReferencePersonProfileRelationsParser} from "./FirstPersonProfileReferencePersonProfileRelationsParser.ts";
 import type {PersonProfileRelationsParser} from "./PersonProfileRelationsParser.ts";
 import type {RelationTypeToPersonProfileReferences} from "./RelationTypeToPersonProfileReferences.ts";
+import {somethingToRelatonType} from "./somethingToRelatonType.ts";
 export class NonFirstRelationTypePersonProfileRelationsParser
 	implements PersonProfileRelationsParser
 {
@@ -15,25 +16,23 @@ export class NonFirstRelationTypePersonProfileRelationsParser
 		this.relationTypeToPersonProfileReferences = relationTypeToPersonProfileReferences;
 	}
 	public parseText(text: string): FirstPersonProfileReferencePersonProfileRelationsParser {
-		const relationType = (
-			{
-				"\npartner ": "partner",
-				"\nżona ": "partner",
-				"\nmatka ": "child",
-				"\nsiostra ": "sibling",
-				"\nbrat ": "sibling",
-				"\nmąż ": "partner",
-				"\nojciec ": "child",
-				"\nbyła partnerka ": "partner",
-				"\nwdowiec po ": "partner",
-				"\nwdowa po ": "partner",
-				"\nprzyrodnia siostra ": "halfSibling",
-			} as const
-		)[text];
+		const match = /\n(?<something>.*) /.exec(text);
+		if (match === null) {
+			throw new Error("An unexpected text.");
+		}
+		const relationType =
+			somethingToRelatonType[
+				(
+					match.groups as {
+						something: string;
+					}
+				).something
+			];
 		if (relationType === undefined) {
 			throw new Error("An unexpected text.");
 		}
 		if (this.relationTypeToPersonProfileReferences.has(relationType)) {
+			debugger;
 			throw new Error("A duplicate relation type.");
 		}
 		return new FirstPersonProfileReferencePersonProfileRelationsParser(

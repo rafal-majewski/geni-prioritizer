@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PersonsListItem from "./PersonsListItem.svelte";
 	import type {Person} from "./Person.ts";
 	const {
 		persons,
@@ -8,7 +9,7 @@
 </script>
 
 <ul>
-	{#each persons as person}
-		<li>{person.name}</li>
+	{#each persons as person (person.profileUrl)}
+		<PersonsListItem {person}></PersonsListItem>
 	{/each}
 </ul>

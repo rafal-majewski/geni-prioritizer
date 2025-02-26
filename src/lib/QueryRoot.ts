@@ -1,5 +1,5 @@
 import type {PersonProfileUrl} from "./PersonProfileUrl.ts";
-export type ScrapingQueryRoot = Readonly<{
+export type QueryRoot = Readonly<{
 	url: PersonProfileUrl;
 	priority: number;
 }>;

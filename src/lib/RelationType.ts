@@ -1,1 +1,8 @@
-export type RelationType = "parent" | "partner" | "child" | "sibling" | "halfSibling";
+export type RelationType =
+	| "parent"
+	| "partner"
+	| "child"
+	| "sibling"
+	| "halfSibling"
+	| "exPartner"
+	| "widower";

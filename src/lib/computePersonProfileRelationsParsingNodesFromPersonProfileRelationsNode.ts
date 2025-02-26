@@ -7,7 +7,7 @@ import type {TextPersonProfileRelationsParsingNode} from "./TextPersonProfileRel
 /**
  * Puppeteer sends this function to the browser. Please do not use any imports inside.
  */
-export function computePersonProfileRelationsParsingNodeFromPersonProfileRelationsNode(
+export function computePersonProfileRelationsParsingNodesFromPersonProfileRelationsNode(
 	node: Node,
 ): readonly SupportedPersonProfileRelationsParsingNode[] {
 	return [...node.childNodes].flatMap(

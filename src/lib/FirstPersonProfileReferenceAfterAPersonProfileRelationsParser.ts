@@ -1,4 +1,5 @@
 import {DonePersonProfileRelationsParser} from "./DonePersonProfileRelationsParser.ts";
+import {FirstPersonProfileReferenceAfterATextPersonProfileRelationsParser} from "./FirstPersonProfileReferenceAfterATextPersonProfileRelationsParser.ts";
 import {IntermediatePersonProfileReferencePersonProfileRelationsParser} from "./IntermediatePersonProfileReferencePersonProfileRelationsParser.ts";
 import {LastPersonProfileReferencePersonProfileRelationsParser} from "./LastPersonProfileReferencePersonProfileRelationsParser.ts";
 import type {PersonProfileReference} from "./PersonProfileReference.ts";
@@ -36,13 +37,23 @@ export class FirstPersonProfileReferenceAfterAPersonProfileRelationsParser
 		| LastPersonProfileReferencePersonProfileRelationsParser
 		| DonePersonProfileRelationsParser
 		| RelationTypeSeparatorPersonProfileRelationsParser
-		| IntermediatePersonProfileReferencePersonProfileRelationsParser {
+		| IntermediatePersonProfileReferencePersonProfileRelationsParser
+		| FirstPersonProfileReferenceAfterATextPersonProfileRelationsParser {
 		switch (text) {
 			case " i ": {
 				return new LastPersonProfileReferencePersonProfileRelationsParser(
 					this.relationTypeToPersonProfileReferences,
 					this.currentRelationType,
 					this.currentPersonProfileReferences,
+				);
+			}
+			case "  \n\n": {
+				const newRelationTypeToPersonProfileReferences = new Map([
+					...this.relationTypeToPersonProfileReferences,
+					[this.currentRelationType, this.currentPersonProfileReferences],
+				]);
+				return new FirstPersonProfileReferenceAfterATextPersonProfileRelationsParser(
+					newRelationTypeToPersonProfileReferences,
 				);
 			}
 			case "; ": {
@@ -60,8 +71,12 @@ export class FirstPersonProfileReferenceAfterAPersonProfileRelationsParser
 				return new DonePersonProfileRelationsParser(newRelationTypeToPersonProfileReferences);
 			}
 			case " ": {
+				const newRelationTypeToPersonProfileReferences = new Map([
+					...this.relationTypeToPersonProfileReferences,
+					[this.currentRelationType, this.currentPersonProfileReferences],
+				]);
 				return new RelationTypeSeparatorPersonProfileRelationsParser(
-					this.relationTypeToPersonProfileReferences,
+					newRelationTypeToPersonProfileReferences,
 				);
 			}
 			default: {

@@ -6,9 +6,10 @@ export function computePersonProfileReferenceFromAPersonProfileRelationsParsingN
 	if (data.dataProfileId === undefined) {
 		throw new Error("Expected dataProfileId to be defined.");
 	}
+	const hrefAsUrl = new URL(data.href);
+	const urlAsString = `${hrefAsUrl.origin}${hrefAsUrl.pathname}`;
 	return {
 		name: data.textContent,
-		url: data.href,
-		id: data.dataProfileId,
+		url: urlAsString,
 	};
 }

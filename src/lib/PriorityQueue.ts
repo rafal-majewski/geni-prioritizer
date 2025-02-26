@@ -1,14 +1,17 @@
 import type {PriorityQueueEntry} from "./PriorityQueueEntry.ts";
 export class PriorityQueue<Datum> {
-	private readonly queue: PriorityQueueEntry<Datum>[];
+	private readonly entries: PriorityQueueEntry<Datum>[];
 	public constructor() {
-		this.queue = [];
+		this.entries = [];
 	}
 	public push(entry: PriorityQueueEntry<Datum>): void {
-		this.queue.push(entry);
-		this.queue.sort((entryLeft, entryRight) => entryLeft.priority - entryRight.priority);
+		this.entries.push(entry);
+		this.entries.sort((entryLeft, entryRight) => entryRight.priority - entryLeft.priority);
 	}
-	public pop(): PriorityQueueEntry<Datum> | undefined {
-		return this.queue.pop();
+	public shift(): PriorityQueueEntry<Datum> | undefined {
+		return this.entries.shift();
+	}
+	public clear(): void {
+		this.entries.splice(0, this.entries.length);
 	}
 }

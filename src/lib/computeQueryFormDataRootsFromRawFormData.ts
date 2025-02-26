@@ -1,10 +1,10 @@
-import type {ScrapingQueryFormDataRoot} from "./ScrapingQueryFormDataRoot.ts";
-export function computeScrapingQueryFormDataRootsFromRawFormData(
+import type {QueryFormDataRoot} from "./QueryFormDataRoot.ts";
+export function computeQueryFormDataRootsFromRawFormData(
 	rawUrls: readonly FormDataEntryValue[],
 	rawPriorities: readonly FormDataEntryValue[],
-): readonly ScrapingQueryFormDataRoot[] | null {
+): readonly QueryFormDataRoot[] | null {
 	const rootCount = Math.max(rawUrls.length, rawPriorities.length);
-	const roots: ScrapingQueryFormDataRoot[] = [];
+	const roots: QueryFormDataRoot[] = [];
 	for (let rootIndex = 0; rootIndex < rootCount; ++rootIndex) {
 		const rawUrl = rawUrls[rootIndex];
 		if (typeof rawUrl !== "string") {
@@ -19,7 +19,7 @@ export function computeScrapingQueryFormDataRootsFromRawFormData(
 		const root = {
 			url,
 			priority,
-		} as const satisfies ScrapingQueryFormDataRoot;
+		} as const satisfies QueryFormDataRoot;
 		roots.push(root);
 	}
 	return roots;

@@ -1,3 +1,5 @@
+import {IntermediatePersonProfileReferenceAfterASpanSpanPersonProfileRelationsParser} from "./IntermediatePersonProfileReferenceAfterASpanSpanPersonProfileRelationsParser.ts";
+import {parsePersonProfileCollapsedRelationsParsingNodes} from "./parsePersonProfileCollapsedRelationsParsingNodes.ts";
 import type {PersonProfileReference} from "./PersonProfileReference.ts";
 import type {PersonProfileRelationsParser} from "./PersonProfileRelationsParser.ts";
 import type {RelationType} from "./RelationType.ts";
@@ -6,15 +8,20 @@ import type {SpanPersonProfileRelationsParsingNodeData} from "./SpanPersonProfil
 export class IntermediatePersonProfileReferenceAfterASpanPersonProfileRelationsParser
 	implements PersonProfileRelationsParser
 {
-	public parseSpan(data: SpanPersonProfileRelationsParsingNodeData): never {
-		let parser: PersonProfileCollapsedRelationsParser = new C();
-		console.log(nodes);
-		for (const node of data.childNodes) {
-			console.log(parser, JSON.stringify(node));
-			parser = parsePersonProfileCollapsedRelationsParsingNode(parser, node);
-		}
-		console.log(parser);
-		return parser.finalize();
+	public parseSpan(
+		data: SpanPersonProfileRelationsParsingNodeData,
+	): IntermediatePersonProfileReferenceAfterASpanSpanPersonProfileRelationsParser {
+		const finalCurrentPersonProfileReferences = [
+			...this.currentPersonProfileReferences,
+			...parsePersonProfileCollapsedRelationsParsingNodes(data.childNodes),
+		] as const;
+		const newRelationTypeToPersonProfileReferences = new Map([
+			...this.relationTypeToPersonProfileReferences,
+			[this.currentRelationType, finalCurrentPersonProfileReferences],
+		]);
+		return new IntermediatePersonProfileReferenceAfterASpanSpanPersonProfileRelationsParser(
+			newRelationTypeToPersonProfileReferences,
+		);
 	}
 	public parseImg(): never {
 		throw new Error("An unexpected img.");
