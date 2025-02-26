@@ -66,8 +66,8 @@ export class Manager {
 		return [...computedPriorities.entries()]
 			.toSorted(
 				(leftEntry, rightEntry) =>
-					rightEntry[1] * rightEntry[0].explorationPercentage -
-					leftEntry[1] * leftEntry[0].explorationPercentage,
+					rightEntry[1] * (1 - rightEntry[0].explorationPercentage) -
+					leftEntry[1] * (1 - leftEntry[0].explorationPercentage),
 			)
 			.map((entry) => entry[0]);
 	}
