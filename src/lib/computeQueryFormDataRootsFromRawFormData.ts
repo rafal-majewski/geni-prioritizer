@@ -15,7 +15,7 @@ export function computeQueryFormDataRootsFromRawFormData(
 		if (typeof rawPriority !== "string") {
 			return null;
 		}
-		const priority = rawPriority === "" ? null : Number(rawPriority);
+		const priority = rawPriority.trim() === "" ? null : Number(rawPriority);
 		const root = {
 			url,
 			priority,

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type {QueryFormData} from "./QueryFormData.ts";
 	const {
-		queryFormData,
+		formData,
 	}: Readonly<{
-		queryFormData: QueryFormData;
+		formData: QueryFormData;
 	}> = $props();
 </script>
 
@@ -11,7 +11,7 @@
 	<section>
 		<section>
 			<ul>
-				{#each queryFormData.roots as root, index (index)}
+				{#each formData.roots as root, index (index)}
 					<li>
 						<header>
 							Root {index + 1}

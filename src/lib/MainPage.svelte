@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type {Person} from "./Person.ts";
-	import PersonsList from "./PersonsList.svelte";
+	import PersonsList from "./QueryResultsList.svelte";
 	import QueryForm from "./QueryForm.svelte";
 	import type {QueryFormData} from "./QueryFormData.ts";
+	import type {QueryResult} from "./QueryResult.ts";
 	const {
-		queryFormData,
-		persons,
+		formData,
+		results,
 	}: {
-		queryFormData: QueryFormData;
-		persons: readonly Person[];
+		formData: QueryFormData;
+		results: readonly QueryResult[];
 	} = $props();
 </script>
 
-<QueryForm {queryFormData} />
-<PersonsList {persons} />
+<QueryForm {formData} />
+<PersonsList {results} />

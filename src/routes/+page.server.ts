@@ -22,16 +22,45 @@ export const actions = {
 	async "add-root"({request}) {
 		const rawFormData: FormData = await request.formData();
 		const queryFormData = computeQueryFormDataFromRawFormData(rawFormData);
+		// TODO: DO NOT ALLOW INVALID QUERIES
 		if (queryFormData === null) {
 			return fail(400);
 		}
 		const newQueryFormData = addRootToQueryFormData(queryFormData);
 		return newQueryFormData;
 	},
+	async "set-exploration-percentage"({request}) {
+		const rawFormData: FormData = await request.formData();
+		const rawExplorationPercentage = rawFormData.get("exploration-percentage");
+		if (typeof rawExplorationPercentage !== "string") {
+			return fail(400);
+		}
+		const rawProfileUrl = rawFormData.get("profile-url");
+		if (typeof rawProfileUrl !== "string") {
+			return fail(400);
+		}
+		const explorationPercentage =
+			rawExplorationPercentage.trim() === "" ? null : Number(rawExplorationPercentage);
+		if (explorationPercentage === null) {
+			return fail(400);
+		}
+		const profileUrl = rawProfileUrl === "" ? null : rawProfileUrl;
+		if (profileUrl === null) {
+			return fail(400);
+		}
+		switch (await manager.setExplorationPercentageOfPerson(profileUrl, explorationPercentage)) {
+			case "notFound": {
+				return fail(400);
+			}
+			case "success": {
+				return;
+			}
+		}
+	},
 };
-export function load() {
+export async function load() {
 	return {
-		persons: manager.getPersons(),
-		queryFormData: manager.getQuery(),
+		results: await manager.getResults(),
+		query: manager.getQuery(),
 	};
 }

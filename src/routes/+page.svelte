@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type {Person} from "../lib/Person.ts";
 	import type {QueryFormData} from "../lib/QueryFormData.ts";
 	import MainPage from "../lib/MainPage.svelte";
+	import type {QueryResult} from "$lib/QueryResult.ts";
 	const {data, form} = $props();
-	const persons = $derived<readonly Person[]>(data.persons);
-	const queryFormData = $derived<QueryFormData>(form ?? data.queryFormData);
+	const results = $derived<readonly QueryResult[]>(data.results);
+	const formData = $derived<QueryFormData>(form ?? data.query);
 </script>
 
-<MainPage {persons} {queryFormData} />
+<MainPage {results} {formData} />
