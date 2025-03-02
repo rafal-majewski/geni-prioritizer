@@ -14,7 +14,7 @@ export class PuppeteerScrapingWorker implements ScrapingWorker {
 		await this.page.goto(url);
 		const name = await this.page.$eval(
 			"#profile-basics > div.module.mbl > div > div.unit.size_2of3 > div > div.bd.identity-module > h2 > span.strong.quiet",
-			(element) => element.textContent,
+			(element) => (element.textContent as string).trim(),
 		);
 		if (name === null) {
 			throw new Error("name is null.");

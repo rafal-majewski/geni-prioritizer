@@ -6,7 +6,7 @@ export function addRootToQueryFormData(data: QueryFormData): QueryFormData {
 			...data.roots,
 			{
 				url: null,
-				priority: null,
+				importance: null,
 			},
 		],
 	};

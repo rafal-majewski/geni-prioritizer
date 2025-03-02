@@ -22,8 +22,8 @@
 								<input type="url" value={root.url} name="root-url" />
 							</label>
 							<label>
-								priority:
-								<input type="number" step="0.01" value={root.priority} name="root-priority" />
+								importance:
+								<input type="number" step="0.01" value={root.importance} name="root-importance" />
 							</label>
 							<button type="submit" formaction="/?/remove-root" formmethod="post">Remove</button>
 						</section>

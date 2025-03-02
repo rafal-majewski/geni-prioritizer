@@ -1,19 +1,14 @@
 <script lang="ts">
-	import {personLoadingStatusToPersonLoadingStatusEmoji} from "./personLoadingStatusToPersonLoadingStatusEmoji.ts";
 	import type {QueryResult} from "./QueryResult.ts";
 	const {
 		result,
 	}: {
 		result: QueryResult;
 	} = $props();
-	const loadingStatusEmoji = $derived(
-		personLoadingStatusToPersonLoadingStatusEmoji[result.person.loadingStatus],
-	);
 </script>
 
 <li>
 	{result.priority}
-	{loadingStatusEmoji}
 	{result.person.name}
 	<form action="/?/set-exploration-percentage" method="post">
 		<input

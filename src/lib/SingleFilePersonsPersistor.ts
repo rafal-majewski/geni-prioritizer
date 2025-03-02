@@ -4,11 +4,17 @@ import type {PersonProfileUrl} from "./PersonProfileUrl.ts";
 import type {PersonsPersistor} from "./PersonsPersistor.ts";
 export class SingleFilePersonsPersistor implements PersonsPersistor {
 	private readonly filePath: string;
+	private currentOperationPromise: Promise<unknown>;
 	public constructor(filePath: string) {
 		this.filePath = filePath;
+		this.currentOperationPromise = Promise.resolve();
 	}
 	private async loadFromFile(): Promise<ReadonlyMap<PersonProfileUrl, Person>> {
-		const fileContent = await fs.readFile(this.filePath, "utf-8").catch(() => null);
+		const readOperationPromise = this.currentOperationPromise.then(() =>
+			fs.readFile(this.filePath, "utf-8").catch(() => null),
+		);
+		this.currentOperationPromise = readOperationPromise;
+		const fileContent = await readOperationPromise.then((content) => content);
 		return (fileContent === null ? [] : (JSON.parse(fileContent) as readonly Person[])).reduce<
 			Map<PersonProfileUrl, Person>
 		>((accumulatedPersons, person) => {
@@ -17,7 +23,13 @@ export class SingleFilePersonsPersistor implements PersonsPersistor {
 		}, new Map());
 	}
 	private async saveToFile(persons: ReadonlyMap<PersonProfileUrl, Person>): Promise<void> {
-		await fs.writeFile(this.filePath, JSON.stringify([...persons.values()]), "utf-8");
+		const writeOperationPromise = this.currentOperationPromise.then(() =>
+			fs.writeFile(this.filePath, JSON.stringify([...persons.values()], null, "\t"), {
+				encoding: "utf-8",
+			}),
+		);
+		this.currentOperationPromise = writeOperationPromise;
+		await writeOperationPromise;
 	}
 	async save(person: Person): Promise<void> {
 		const persons = await this.loadFromFile();
@@ -27,22 +39,5 @@ export class SingleFilePersonsPersistor implements PersonsPersistor {
 	async get(profileUrl: PersonProfileUrl): Promise<Person | undefined> {
 		const persons = await this.loadFromFile();
 		return persons.get(profileUrl);
-	}
-	async setExplorationPercentageOfPerson(
-		profileUrl: PersonProfileUrl,
-		explorationPercentage: number,
-	): Promise<"notFound" | "success"> {
-		const persons = await this.loadFromFile();
-		const person = persons.get(profileUrl);
-		if (person === undefined) {
-			return "notFound";
-		}
-		const newPerson: Person = {
-			...person,
-			explorationPercentage,
-		};
-		const newPersons = new Map([...persons.entries(), [profileUrl, newPerson]]);
-		await this.saveToFile(newPersons);
-		return "success";
 	}
 }

@@ -9,171 +9,117 @@ import type {QueryResult} from "./QueryResult.ts";
 import type {ScrapingWorker} from "./ScrapingWorker.ts";
 export class Manager {
 	private query: Query;
-	private readonly profileToScrapeUrlQueue: PriorityQueue<PersonProfileUrl>;
 	private readonly worker: ScrapingWorker;
 	private readonly persistor: PersonsPersistor;
+	private readonly computedImportances: Map<PersonProfileUrl, number>;
+	private readonly profileToTraverseUrlsQueue: PriorityQueue<PersonProfileUrl>;
 	public constructor(worker: ScrapingWorker, persistor: PersonsPersistor) {
 		this.persistor = persistor;
-		this.profileToScrapeUrlQueue = new PriorityQueue();
+		this.computedImportances = new Map();
+		this.profileToTraverseUrlsQueue = new PriorityQueue();
 		this.worker = worker;
 		this.query = emptyQuery;
 	}
+	public async process(): Promise<void> {
+		const entry = this.profileToTraverseUrlsQueue.shift();
+		if (entry === undefined) {
+			return;
+		}
+		const person = await this.getPerson(entry.datum);
+		if (person === undefined) {
+			throw new Error("Person not found.");
+		}
+		const actualImportance = this.computedImportances.get(entry.datum);
+		if (actualImportance === undefined || entry.priority > actualImportance) {
+			this.computedImportances.set(entry.datum, entry.priority);
+		}
+		for (const relatedPersonProfileUrl of Object.values(person.relations).flat()) {
+			const relatedPersonExpectedImportance = entry.priority * 0.9;
+			this.profileToTraverseUrlsQueue.push({
+				datum: relatedPersonProfileUrl,
+				priority: relatedPersonExpectedImportance,
+			});
+		}
+	}
 	public async getResults(): Promise<readonly QueryResult[]> {
-		const computedPriorities = new Map<Person, number>();
-		const profileToTraverseQueue = new PriorityQueue<Person>();
-		for (const root of this.query.roots) {
-			const person = await this.persistor.get(root.url);
-			if (person === undefined) {
-				continue;
-			}
-			const entry: PriorityQueueEntry<Person> = {
-				datum: person,
-				priority: root.priority,
-			};
-			profileToTraverseQueue.push(entry);
-			computedPriorities.set(person, root.priority);
-		}
-		for (;;) {
-			const entry = profileToTraverseQueue.shift();
-			if (entry === undefined) {
-				break;
-			}
-			for (const relatedPersonProfileUrl of Object.values(entry.datum.relations).flat()) {
-				// TODO: Rename
-				const newPriority = entry.priority * 0.9;
-				const relatedPerson = await this.persistor.get(relatedPersonProfileUrl);
-				if (relatedPerson === undefined) {
-					continue;
-				}
-				const relatedPersonPriority = computedPriorities.get(relatedPerson);
-				if (relatedPersonPriority === undefined || newPriority > relatedPersonPriority) {
-					const newEntry: PriorityQueueEntry<Person> = {
-						datum: relatedPerson,
-						priority: newPriority,
+		return (
+			await Promise.all(
+				[...this.computedImportances.entries()].map(async (entry): Promise<QueryResult> => {
+					const person = await this.persistor.get(entry[0]);
+					if (person === undefined) {
+						throw new Error("Person not found.");
+					}
+					4;
+					return {
+						person: person,
+						priority: entry[1] * (1 - person.explorationPercentage),
 					};
-					profileToTraverseQueue.push(newEntry);
-					computedPriorities.set(relatedPerson, newPriority);
-				}
-			}
-		}
-		return [...computedPriorities.entries()]
-			.map(
-				(entry): QueryResult => ({
-					person: entry[0],
-					priority: entry[1] * (1 - entry[0].explorationPercentage),
 				}),
 			)
-			.toSorted((leftResult, rightResult) => rightResult.priority - leftResult.priority);
+		).toSorted((leftResult, rightResult) => rightResult.priority - leftResult.priority);
 	}
-	public setExplorationPercentageOfPerson(
+	public async setExplorationPercentageOfPerson(
 		profileUrl: PersonProfileUrl,
 		explorationPercentage: number,
 		// TODO: Refactor output type
 	): Promise<"notFound" | "success"> {
-		return this.persistor.setExplorationPercentageOfPerson(profileUrl, explorationPercentage);
+		const person = await this.persistor.get(profileUrl);
+		if (person === undefined) {
+			return "notFound";
+		}
+		const newPerson: Person = {
+			...person,
+			explorationPercentage: explorationPercentage,
+		};
+		this.persistor.save(newPerson);
+		return "success";
 	}
 	public setQuery(query: Query): void {
-		this.profileToScrapeUrlQueue.clear();
-		for (const root of query.roots) {
+		this.computedImportances.clear();
+		this.profileToTraverseUrlsQueue.clear();
+		this.query = query;
+		for (const root of this.query.roots) {
 			const entry: PriorityQueueEntry<PersonProfileUrl> = {
 				datum: root.url,
-				priority: root.priority,
+				priority: root.importance,
 			};
-			this.profileToScrapeUrlQueue.push(entry);
+			this.profileToTraverseUrlsQueue.push(entry);
 		}
-		this.query = query;
 	}
 	public getQuery(): Query {
 		return this.query;
 	}
-	public async process(): Promise<void> {
-		const entry = this.profileToScrapeUrlQueue.shift();
-		if (entry === undefined) {
-			return;
+	// TODO: Move to another file
+	private async getPerson(profileUrl: PersonProfileUrl): Promise<Person | undefined> {
+		const existingPerson = await this.persistor.get(profileUrl);
+		if (
+			existingPerson !== undefined &&
+			Math.random() <
+				2 ** -((existingPerson.scrapingTimestampSeconds - Date.now() / 1000) / (60 * 60 * 24))
+		) {
+			return existingPerson;
 		}
-		const existingPerson = await this.persistor.get(entry.datum);
-		const person =
-			existingPerson !== undefined && existingPerson.loadingStatus === "loaded"
-				? existingPerson
-				: await this.worker.scrape(entry.datum).then<Person>(async (profile) => {
-						const newPerson: Person = {
-							loadingStatus: "loaded",
-							name: profile.name,
-							profileUrl: entry.datum,
-							explorationPercentage: 0,
-							// TODO: Refactor
-							// parentProfileUrls: (profile.relations.get("parent") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// partnerProfileUrls: (profile.relations.get("partner") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// childProfileUrls: (profile.relations.get("child") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// siblingProfileUrls: (profile.relations.get("sibling") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// halfSiblingProfileUrls: (profile.relations.get("halfSibling") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// exPartnerProfileUrls: (profile.relations.get("exPartner") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							// widowerProfileUrls: (profile.relations.get("widower") ?? []).map(
-							// 	(reference) => reference.url,
-							// ),
-							relations: {
-								parent: (profile.relations.get("parent") ?? []).map((reference) => reference.url),
-								partner: (profile.relations.get("partner") ?? []).map((reference) => reference.url),
-								child: (profile.relations.get("child") ?? []).map((reference) => reference.url),
-								sibling: (profile.relations.get("sibling") ?? []).map((reference) => reference.url),
-								halfSibling: (profile.relations.get("halfSibling") ?? []).map(
-									(reference) => reference.url,
-								),
-								exPartner: (profile.relations.get("exPartner") ?? []).map(
-									(reference) => reference.url,
-								),
-								widower: (profile.relations.get("widower") ?? []).map((reference) => reference.url),
-							},
-						};
-						this.persistor.save(newPerson);
-						for (const references of profile.relations.values()) {
-							for (const reference of references) {
-								const existingReferencedPerson = await this.persistor.get(reference.url);
-								if (
-									existingReferencedPerson !== undefined &&
-									existingReferencedPerson.loadingStatus === "loaded"
-								) {
-									continue;
-								}
-								const referencedPerson: Person = {
-									loadingStatus: "loading",
-									profileUrl: reference.url,
-									name: reference.name,
-									explorationPercentage: 0,
-									// TODO: Reverse
-									relations: {
-										parent: [],
-										partner: [],
-										child: [],
-										sibling: [],
-										halfSibling: [],
-										exPartner: [],
-										widower: [],
-									},
-								};
-								this.persistor.save(referencedPerson);
-							}
-						}
-						return newPerson;
-					});
-		for (const relatedPersonProfileUrl of Object.values(person.relations).flat()) {
-			const newEntry: PriorityQueueEntry<PersonProfileUrl> = {
-				datum: relatedPersonProfileUrl,
-				priority: entry.priority * 0.9,
-			};
-			this.profileToScrapeUrlQueue.push(newEntry);
+		const profile = await this.worker.scrape(profileUrl);
+		if (profile === undefined) {
+			return undefined;
 		}
+		const newPerson: Person = {
+			name: profile.name,
+			profileUrl: profileUrl,
+			explorationPercentage: 0,
+			// TODO: Refactor relations
+			relations: {
+				parent: (profile.relations.get("parent") ?? []).map((reference) => reference.url),
+				partner: (profile.relations.get("partner") ?? []).map((reference) => reference.url),
+				child: (profile.relations.get("child") ?? []).map((reference) => reference.url),
+				sibling: (profile.relations.get("sibling") ?? []).map((reference) => reference.url),
+				halfSibling: (profile.relations.get("halfSibling") ?? []).map((reference) => reference.url),
+				exPartner: (profile.relations.get("exPartner") ?? []).map((reference) => reference.url),
+				widower: (profile.relations.get("widower") ?? []).map((reference) => reference.url),
+			},
+			scrapingTimestampSeconds: Date.now() / 1000,
+		};
+		this.persistor.save(newPerson);
+		return newPerson;
 	}
 }

@@ -1,9 +1,9 @@
 import type {QueryFormDataRoot} from "./QueryFormDataRoot.ts";
 export function computeQueryFormDataRootsFromRawFormData(
 	rawUrls: readonly FormDataEntryValue[],
-	rawPriorities: readonly FormDataEntryValue[],
+	rawImportances: readonly FormDataEntryValue[],
 ): readonly QueryFormDataRoot[] | null {
-	const rootCount = Math.max(rawUrls.length, rawPriorities.length);
+	const rootCount = Math.max(rawUrls.length, rawImportances.length);
 	const roots: QueryFormDataRoot[] = [];
 	for (let rootIndex = 0; rootIndex < rootCount; ++rootIndex) {
 		const rawUrl = rawUrls[rootIndex];
@@ -11,14 +11,14 @@ export function computeQueryFormDataRootsFromRawFormData(
 			return null;
 		}
 		const url = rawUrl === "" ? null : rawUrl;
-		const rawPriority = rawPriorities[rootIndex];
-		if (typeof rawPriority !== "string") {
+		const rawImportance = rawImportances[rootIndex];
+		if (typeof rawImportance !== "string") {
 			return null;
 		}
-		const priority = rawPriority.trim() === "" ? null : Number(rawPriority);
+		const importance = rawImportance.trim() === "" ? null : Number(rawImportance);
 		const root = {
-			url,
-			priority,
+			url: url,
+			importance: importance,
 		} as const satisfies QueryFormDataRoot;
 		roots.push(root);
 	}

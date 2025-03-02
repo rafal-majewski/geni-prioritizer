@@ -6,11 +6,11 @@ export function computeQueryRootFromQueryFormDataRoot(
 	if (formDataRoot.url === null) {
 		return null;
 	}
-	if (formDataRoot.priority === null) {
+	if (formDataRoot.importance === null) {
 		return null;
 	}
 	return {
 		url: formDataRoot.url,
-		priority: formDataRoot.priority,
+		importance: formDataRoot.importance,
 	};
 }
