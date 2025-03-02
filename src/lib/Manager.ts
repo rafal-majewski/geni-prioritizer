@@ -49,7 +49,6 @@ export class Manager {
 					if (person === undefined) {
 						throw new Error("Person not found.");
 					}
-					4;
 					return {
 						person: person,
 						priority: entry[1] * (1 - person.explorationPercentage),
@@ -71,7 +70,7 @@ export class Manager {
 			...person,
 			explorationPercentage: explorationPercentage,
 		};
-		this.persistor.save(newPerson);
+		await this.persistor.save(newPerson);
 		return "success";
 	}
 	public setQuery(query: Query): void {
@@ -95,7 +94,7 @@ export class Manager {
 		if (
 			existingPerson !== undefined &&
 			Math.random() <
-				2 ** -((existingPerson.scrapingTimestampSeconds - Date.now() / 1000) / (60 * 60 * 24))
+				3 ** -((existingPerson.scrapingTimestampSeconds - Date.now() / 1000) / (60 * 60 * 24))
 		) {
 			return existingPerson;
 		}
