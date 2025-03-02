@@ -6,6 +6,6 @@ export const manager = new Manager(puppeteerScrapingWorker, singleFilePersonsPer
 (async () => {
 	for (;;) {
 		await manager.process();
-		await wait(10);
+		await wait(1);
 	}
 })();

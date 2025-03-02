@@ -53,7 +53,6 @@ export const actions = {
 				return fail(400);
 			}
 			case "success": {
-				console.log("Success");
 				return;
 			}
 		}

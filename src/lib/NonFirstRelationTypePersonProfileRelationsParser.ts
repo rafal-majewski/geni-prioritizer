@@ -32,7 +32,6 @@ export class NonFirstRelationTypePersonProfileRelationsParser
 			throw new Error("An unexpected text.");
 		}
 		if (this.relationTypeToPersonProfileReferences.has(relationType)) {
-			console.log(this.relationTypeToPersonProfileReferences, relationType);
 			throw new Error("A duplicate relation type.");
 		}
 		return new FirstPersonProfileReferencePersonProfileRelationsParser(

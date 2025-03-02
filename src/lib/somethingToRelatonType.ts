@@ -1,4 +1,5 @@
 import type {RelationType} from "./RelationType.ts";
+// TODO: Rename
 export const somethingToRelatonType: Record<string, RelationType> = {
 	partner: "partner",
 	żona: "partner",
