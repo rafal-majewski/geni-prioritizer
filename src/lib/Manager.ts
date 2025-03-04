@@ -94,7 +94,7 @@ export class Manager {
 		if (
 			existingPerson !== undefined &&
 			Math.random() <
-				3 ** -((existingPerson.scrapingTimestampSeconds - Date.now() / 1000) / (60 * 60 * 24))
+				3 ** -((Date.now() / 1000 - existingPerson.scrapingTimestampSeconds) / (60 * 60 * 24))
 		) {
 			return existingPerson;
 		}
@@ -105,7 +105,8 @@ export class Manager {
 		const newPerson: Person = {
 			name: profile.name,
 			profileUrl: profileUrl,
-			explorationPercentage: 0,
+			explorationPercentage:
+				existingPerson === undefined ? 0 : existingPerson.explorationPercentage,
 			// TODO: Refactor relations
 			relations: {
 				parent: (profile.relations.get("parent") ?? []).map((reference) => reference.url),
