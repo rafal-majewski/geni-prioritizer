@@ -2,7 +2,7 @@
 	"devDependencies": {
 		"@sveltejs/kit": "2.21.0",
 		"prettier": "3.5.3",
-		"svelte-check": "4.1.7",
+		"svelte-check": "4.2.1",
 		"vite": "6.3.4"
 	},
 	"scripts": {
