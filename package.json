@@ -3,7 +3,7 @@
 		"@sveltejs/kit": "2.28.0",
 		"prettier": "3.4.2",
 		"svelte-check": "4.3.1",
-		"vite": "7.1.1"
+		"vite": "7.1.2"
 	},
 	"scripts": {
 		"build:check": "svelte-kit sync && svelte-check --fail-on-warnings",
