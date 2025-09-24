@@ -1,6 +1,6 @@
 {
 	"devDependencies": {
-		"@sveltejs/kit": "2.43.2",
+		"@sveltejs/kit": "2.43.4",
 		"prettier": "3.4.2",
 		"svelte-check": "4.3.2",
 		"vite": "7.1.6"
