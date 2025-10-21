@@ -11,6 +11,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"puppeteer": "24.25.0"
+		"puppeteer": "24.26.0"
 	}
 }
